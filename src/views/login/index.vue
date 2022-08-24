@@ -46,8 +46,8 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div class="tips">
-          <span style="margin-right:20px;">账号: 13800000002</span>
-          <span> 密码: 123456</span>
+        <span style="margin-right:20px;">账号: 13800000002</span>
+        <span> 密码: 123456</span>
 
       </div>
 
@@ -57,11 +57,12 @@
 
 <script>
 import { validMobile } from '@/utils/validate'
+import { mapActions } from 'vuex'// 引入vuex的辅助函数
 
 export default {
   name: 'Login',
   data() {
-  const validateMobile = (rule, value, callback) => {
+    const validateMobile = (rule, value, callback) => {
       // rule 对应的规则
       // value 对应的值
       // callback 验证完成后调用的回调函数 验证通过直接调用 验证不通过 也是 调用 callback,但是会把错误信息 传递出去
@@ -77,8 +78,8 @@ export default {
         password: '123456'
       },
       loginRules: {
-        mobile: [{ required: true, trigger: 'blur', message:'手机号不能为空' },{validator:validateMobile,trigger: 'blur'}],
-        password: [{ required: true, trigger: 'blur', message:'密码不能为空' },{trigger:'blur',min:6,max:16,message:'密码的长度在6-16位之间'}]
+        mobile: [{ required: true, trigger: 'blur', message: '手机号不能为空' }, { validator: validateMobile, trigger: 'blur' }],
+        password: [{ required: true, trigger: 'blur', message: '密码不能为空' }, { trigger: 'blur', min: 6, max: 16, message: '密码的长度在6-16位之间' }]
       },
       loading: false,
       passwordType: 'password',
@@ -94,6 +95,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['user/loginAction']), // 引入加锁模块的action需要加路径
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -104,21 +106,28 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+    async handleLogin() {
+      // // 表单的手动校验
+      // this.$refs.loginForm.validate(async isOk => {
+      //   if (isOk) {
+      //     try {
+      //       this.loading = true
+      //       await this['user/loginAction'](this.loginForm)
+      //       this.$router.push('/')
+      //     } catch (error) {
+      //       console.log(error)
+      //     } finally { this.loading = false }
+      //   }
+      // })
+      try {
+        this.loading = true
+        await this.$refs.loginForm.validate()
+        // 这里要添加await
+        await this.$store.dispatch('user/loginAction', this.loginForm)
+        this.$router.push('/')
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
@@ -129,7 +138,7 @@ export default {
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
 $bg:#283443;
-$light_gray: #68b0fe;  
+$light_gray: #68b0fe;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -144,7 +153,6 @@ $cursor: #fff;
     display: inline-block;
     height: 47px;
     width: 85%;
-    
 
     input {
       background: transparent;
@@ -155,7 +163,6 @@ $cursor: #fff;
       color: $light_gray;
       height: 47px;
       caret-color: $cursor;
-      
 
       &:-webkit-autofill {
         box-shadow: 0 0 0px 1000px $bg inset !important;
@@ -245,6 +252,6 @@ $light_gray:#eee;
     cursor: pointer;
     user-select: none;
   }
-  
+
 }
 </style>
