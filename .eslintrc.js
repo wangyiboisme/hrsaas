@@ -18,9 +18,7 @@ module.exports = {
       "singleline": 10,
       "multiline": {
         "max": 1,
-        "allowFirstLine": false,
-        "no-trailing-spaces":false
-        // "eol-last": false
+        "allowFirstLine": false
       }
     }],
     "vue/singleline-html-element-content-newline": "off",
