@@ -10,8 +10,8 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="@/assets/common/bigUserHeader.png" class="user-avatar">
-          <span>用户名</span>
+          <img v-imgerror="defaultImg" :src="staffPhoto" class="user-avatar">
+          <span>{{ username }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -34,6 +34,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import defaultImg from '@/assets/common/head.jpg'
 // import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 
@@ -42,10 +43,19 @@ export default {
     // Breadcrumb,
     Hamburger
   },
+  data() {
+    return {
+      // defaultImg: require('@/assets/common/head.jpg')
+      defaultImg: defaultImg
+
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'username',
+      'staffPhoto'
     ])
   },
   methods: {
@@ -54,7 +64,8 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      this.$router.push(`/login`) // 跳到登录
+      // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
 }

@@ -1,18 +1,22 @@
 import router from '@/router'
-import Store from '@/store'
+import store from '@/store'
 // 引入加载状态
 import Nprogress from 'nprogress'
 // 定义白名单
 const whiteList = ['/login', '/404']
 // 前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   Nprogress.start()// 开启进度条
   // 首先判断有无token,所以引入Store
-  if (Store.getters.token) {
+  if (store.getters.token) {
     // 判断是否要进去登录页面
     if (to.path === '/login') {
       next('/')// 跳转到主页
     } else {
+      // 只有放过的时候才会去获取用户资料，如果当前的vuex中有用户的资料id,表示已经有资料了，不需要再获取了，如果没有id才需要获取
+      if (!store.getters.userId) {
+        await store.dispatch('user/getUserInfo')
+      }
       next()// 直接放行
       // next()放过
       // next(false)跳转终止
