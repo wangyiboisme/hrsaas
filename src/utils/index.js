@@ -115,3 +115,40 @@ export function param2Obj(url) {
   })
   return obj
 }
+/** *
+ *
+ *  将列表型的数据转化成树形数据 => 递归算法 => 自身调用自身 => 一定条件不能一样， 否则就会死循环
+ *  遍历树形 有一个重点 要先找一个头儿
+ * ***/
+
+// list，筛选出数据的pid等于传入的rootpid的数据，然后返回
+// 把传入的list里面所有pid=rootPid的数据进行筛选，然后返回
+
+/**
+ * 1、把一级部门放到数据的第一级
+ * // 把所有pid为空的数据对象，放到arr的第一级
+ */
+
+// 找到item一级部门所对应的二级部门
+// 二级部门的pid等于一级部门的id的
+// 从list里面找到pid等于item.id的数据
+// 就是当前部门的二级部门
+// 从list找到pid=rootPid的数据进行筛选，然后返回
+// list需要转化的数据
+
+export function tranListToTreeData(list, rootValue) {
+  var arr = []
+  list.forEach(item => {
+    // 第一次rootValue传进来空字符串-第二个参数去控制找子节点
+    if (item.pid === rootValue) {
+      // 找到之后，就要去找item下面是否有子节点
+      const children = tranListToTreeData(list, item.id)
+      if (children.length > 0) {
+        // 如果children的长度大于0，说明找到了子节点
+        item.children = children
+      }
+      arr.push(item)// 将内容放到数组中
+    }
+  })
+  return arr
+}
